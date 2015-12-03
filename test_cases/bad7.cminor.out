@@ -1,0 +1,2 @@
+Type Error: cannot assign test2(5,6) (boolean) to variable x (integer) 
+Type Error: the arguments to test2 do not match its parameters
