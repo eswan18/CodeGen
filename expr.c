@@ -2,6 +2,7 @@
 #include <string.h>
 #include "expr.h"
 #include "scope.h"
+#include "register.h"
 
 extern int resolve_error_count;
 extern int type_error_count;
@@ -418,4 +419,65 @@ int expr_check_args_params(struct expr *e) {
 		current_param = current_param->next;
 	}
 	return 1;
+}
+
+void expr_codegen(struct expr *e, FILE *file) {
+	switch(e->kind) {
+		case EXPR_ASSIGN:
+			break;
+		case EXPR_ADD:
+			break;
+		case EXPR_SUB:
+			break;
+		case EXPR_MUL:
+			break;
+		case EXPR_DIV:
+			break;
+		case EXPR_MOD:
+			break;
+		case EXPR_AND:
+			break;
+		case EXPR_OR:
+			break;
+		case EXPR_NOT:
+			break;
+		case EXPR_LT:
+			break;
+		case EXPR_LE:
+			break;
+		case EXPR_GT:
+			break;
+		case EXPR_GE:
+			break;
+		case EXPR_EQ:
+			break;
+		case EXPR_NE:
+			break;
+		case EXPR_EXPON:
+			break;
+		case EXPR_INCR:
+			break;
+		case EXPR_DECR:
+			break;
+		case EXPR_NEG:
+			break;
+		case EXPR_FUNC:
+			break;
+		case EXPR_LIST:
+			break;
+		case EXPR_ARRAY_DEREF:
+			break;
+		case EXPR_NAME:
+			break;
+		case EXPR_BOOLEAN_LITERAL:
+			break;
+		case EXPR_INTEGER_LITERAL:
+			e->reg = register_alloc();
+			fprintf(file,"MOV $%d, %s\n",e->literal_value, register_name(e->reg));
+			break;
+		case EXPR_CHARACTER_LITERAL:
+			break;
+		case EXPR_STRING_LITERAL:
+			break;
+	}
 }

@@ -46,6 +46,9 @@ struct expr {
 	struct symbol *symbol;
 	int literal_value;
 	const char *string_literal;
+
+	/*stores location in register*/
+	int reg;
 };
 
 struct expr * expr_create( expr_t kind, struct expr *left, struct expr *right );
@@ -64,5 +67,7 @@ void expr_resolve(struct expr *e, int should_print);
 int expr_is_constant(struct expr *e);
 struct type *expr_typecheck(struct expr *e);
 int expr_check_args_params(struct expr *e);
+
+void expr_codegen(struct expr *e, FILE *file);
 
 #endif

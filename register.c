@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+int register_usage [] = {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0};
+
 const char *register_name(int r) {
 	char *c = malloc(4*sizeof(char *));
 	switch(r) {
@@ -63,8 +65,16 @@ const char *register_name(int r) {
 
 int register_alloc() {
 	int i = 0;
+	for(i = 0;i < 16; i++) {
+		if (register_usage[i] == 0) {
+			register_usage[i] = 1;
+			return i;
+		}
+	}
+	fprintf(stderr,"Error: unable to allocate register. Max register usage exceeded\n");
 	return i;
 }
 
 void register_free(int r) {
+	register_usage[r] = 0;
 }
