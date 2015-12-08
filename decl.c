@@ -166,3 +166,6 @@ void decl_typecheck(struct decl *d) {
 	}
 	decl_typecheck(d->next);
 }
+
+void decl_codegen(struct decl *d, FILE *file) {
+}

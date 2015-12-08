@@ -168,3 +168,6 @@ void stmt_typecheck(struct stmt *s) {
 	}
 	stmt_typecheck(s->next);
 }
+
+void stmt_codegen(struct stmt *s, FILE *file) {
+}

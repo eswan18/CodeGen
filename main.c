@@ -19,13 +19,18 @@ int scan(char *filename);
 int parse(char *filename);
 int resolve(char *filename, int should_print);
 int typecheck(char *filename);
+int codegen(char *filename, char *outfilename);
 
 int main(int argc, char *argv[]) {
         char *filename;
 	char *option;
+	char *outfilename = 0;
         if (argc >= 3) {
                 option = argv[1];
 		filename = argv[2];
+		if (argc >= 4) {
+			outfilename = argv[3];
+		}
         } else {
 		fprintf(stderr,"error: provide both an option (e.g. -scan, -parse) and a filename when invoking cminor.\nfor example: './cminor -parse myfile.cminor'\n");
 		return(1);
@@ -39,8 +44,10 @@ int main(int argc, char *argv[]) {
 		return resolve(filename,1);
 	} else if (strcmp(option,"-typecheck") == 0) {
 		return typecheck(filename);
+	} else if (strcmp(option,"-codegen") == 0) {
+		return codegen(filename,outfilename);
 	} else {
-		fprintf(stderr,"error: illegal option provided\nPlease choose from 'scan', 'parse', 'resolve', or 'typecheck'\n");
+		fprintf(stderr,"error: illegal option provided\nPlease choose from 'scan', 'parse', 'resolve', 'typecheck', or 'codegen'\n");
 		return(1);
 	}
 	
@@ -114,5 +121,21 @@ int typecheck(char *filename) {
 	decl_typecheck(parser_result);
 	if(type_error_count > 0)
 		return 1;
+	return 0;
+}
+
+int codegen(char *filename, char *outfilename) {
+	if(!outfilename) {
+		fprintf(stderr,"error: for codegen option, provide an output file as an argument\n");
+		return 1;
+	}
+	if(typecheck(filename) != 0)
+		return 1;
+	FILE *outfile = fopen(outfilename,"w");
+	if(!outfile) {
+		fprintf(stderr,"error: unable to create or open %s\n",outfilename);
+	} 
+	decl_codegen(parser_result,outfile);
+	fclose(outfile);
 	return 0;
 }

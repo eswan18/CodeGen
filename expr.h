@@ -69,5 +69,6 @@ struct type *expr_typecheck(struct expr *e);
 int expr_check_args_params(struct expr *e);
 
 void expr_codegen(struct expr *e, FILE *file);
+void expr_codegen_func(struct expr *e, FILE *file);
 
 #endif

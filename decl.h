@@ -22,4 +22,6 @@ void decl_resolve(struct decl *d, int should_print);
 
 void decl_typecheck(struct decl *d);
 
+void decl_codegen(struct decl *d, FILE *file);
+
 #endif

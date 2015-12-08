@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int register_usage [] = {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0};
+int register_usage [] = {1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0};
 
 const char *register_name(int r) {
 	char *c = malloc(4*sizeof(char *));

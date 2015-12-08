@@ -429,7 +429,10 @@ void expr_codegen(struct expr *e, FILE *file) {
 	const char *e_name;
 	switch(e->kind) {
 		case EXPR_ASSIGN:
-			//MORE TO DO
+			expr_codegen(e->right,file);
+			right_name = register_name(e->right->reg);
+			fprintf(file,"MOVQ %s, %s\n",right_name,symbol_code(e->left->symbol));
+			e->reg = e->right->reg;
 			break;
 		case EXPR_ADD:
 			expr_codegen(e->left,file);
@@ -511,7 +514,7 @@ void expr_codegen(struct expr *e, FILE *file) {
 			e->reg = e->left->reg;
 			break;
 		case EXPR_FUNC:
-			//MORE TO DO
+			expr_codegen_func(e,file);
 			break;
 		case EXPR_LIST:
 			//MORE TO DO
@@ -541,4 +544,71 @@ void expr_codegen(struct expr *e, FILE *file) {
 			fprintf(file,"LEAQ STR%d, %s\n",current_string_count,e_name);
 			break;
 	}
+}
+
+void expr_codegen_func(struct expr *e, FILE *file) {
+	//Count arguments
+	int arg_count = 0;
+	struct expr *current_list_element = e;
+	while(current_list_element->right) {
+		arg_count++;
+		current_list_element = current_list_element->right;
+	}
+	if (arg_count > 6) {
+		fprintf(stderr,"error: too many arguments to function %s\n",e->left->name);
+		exit(1);
+	}
+
+	//Print appropriate code to store arguments
+	const char *reg_name = 0;
+	struct expr *current_expr = 0;
+	switch(arg_count) {
+		case 6:
+			current_expr = e->right->right->right->right->right->right;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%r9\n",reg_name);
+			register_free(current_expr->reg);
+		case 5:
+			current_expr = e->right->right->right->right->right->left;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%r8\n",reg_name);
+			register_free(current_expr->reg);
+		case 4:
+			current_expr = e->right->right->right->right->left;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%rcx\n",reg_name);
+			register_free(current_expr->reg);
+		case 3:
+			current_expr = e->right->right->right->left;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%rdx\n",reg_name);
+			register_free(current_expr->reg);
+		case 2:
+			current_expr = e->right->right->left;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%rsi\n",reg_name);
+			register_free(current_expr->reg);	
+		case 1:
+			current_expr = e->right->left;
+			expr_codegen(current_expr,file);
+			reg_name = register_name(current_expr->reg);
+			fprintf(file,"MOVQ %s, %%rdi\n",reg_name);
+			register_free(current_expr->reg);
+	}
+
+
+	//Print remaining code
+	fprintf(file,"MOVQ $0, %%rax\n");
+	fprintf(file,"PUSH %%r10\n");
+	fprintf(file,"PUSH %%r11\n");
+	fprintf(file,"CALL %s\n",e->left->name);
+	fprintf(file,"POP %%r11\n");
+	fprintf(file,"POP %%r10\n");
+	e->reg = register_alloc();
+	fprintf(file,"MOVQ %%rax, %s\n",register_name(e->reg));
 }
