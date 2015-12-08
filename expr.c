@@ -7,6 +7,8 @@
 extern int resolve_error_count;
 extern int type_error_count;
 
+int string_count = 0;
+
 struct expr *expr_create( expr_t kind, struct expr *left, struct expr *right ) {
 	struct expr *expr = malloc(sizeof(struct expr));
 	expr -> kind = kind;
@@ -422,62 +424,121 @@ int expr_check_args_params(struct expr *e) {
 }
 
 void expr_codegen(struct expr *e, FILE *file) {
+	const char *left_name = 0;
+	const char *right_name = 0;
+	const char *e_name;
 	switch(e->kind) {
 		case EXPR_ASSIGN:
+			//MORE TO DO
 			break;
 		case EXPR_ADD:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
+			fprintf(file,"ADDQ %s, %s\n",left_name,right_name);
+			e->reg = e->right->reg;
+			register_free(e->left->reg);
 			break;
 		case EXPR_SUB:
+			//MORE TO DO
 			break;
 		case EXPR_MUL:
+			//MORE TO DO
 			break;
 		case EXPR_DIV:
+			//MORE TO DO
 			break;
 		case EXPR_MOD:
+			//MORE TO DO
 			break;
 		case EXPR_AND:
+			//MORE TO DO
 			break;
 		case EXPR_OR:
+			//MORE TO DO
 			break;
 		case EXPR_NOT:
+			//MORE TO DO
 			break;
 		case EXPR_LT:
+			//MORE TO DO
 			break;
 		case EXPR_LE:
+			//MORE TO DO
 			break;
 		case EXPR_GT:
+			//MORE TO DO
 			break;
 		case EXPR_GE:
+			//MORE TO DO
 			break;
 		case EXPR_EQ:
+			//MORE TO DO
 			break;
 		case EXPR_NE:
+			//MORE TO DO
 			break;
 		case EXPR_EXPON:
+			//MORE TO DO
 			break;
 		case EXPR_INCR:
+			e->reg = register_alloc();
+			e_name = register_name(e->reg);
+			expr_codegen(e->left,file);
+			left_name = register_name(e->left->reg);
+			fprintf(file,"MOVQ %s, %s\n",left_name,e_name);
+			fprintf(file,"ADDQ $1, %s\n",left_name);
+			fprintf(file,"MOVQ %s, %s\n",left_name,symbol_code(e->left->symbol));
+			register_free(e->left->reg);
+			e->left->reg = 0;
 			break;
 		case EXPR_DECR:
+			e->reg = register_alloc();
+			e_name = register_name(e->reg);
+			expr_codegen(e->left,file);
+			left_name = register_name(e->left->reg);
+			fprintf(file,"MOVQ %s, %s\n",left_name,e_name);
+			fprintf(file,"SUBQ $1, %s\n",left_name);
+			fprintf(file,"MOVQ %s, %s\n",left_name,symbol_code(e->left->symbol));
+			register_free(e->left->reg);
+			e->left->reg = 0;
 			break;
 		case EXPR_NEG:
+			expr_codegen(e->left,file);
+			left_name = register_name(e->left->reg);
+			fprintf(file,"NEGQ %s\n",left_name);
+			e->reg = e->left->reg;
 			break;
 		case EXPR_FUNC:
+			//MORE TO DO
 			break;
 		case EXPR_LIST:
+			//MORE TO DO
 			break;
 		case EXPR_ARRAY_DEREF:
+			fprintf(stderr,"Error: arrays not implemented\n");
+			exit(1);
 			break;
 		case EXPR_NAME:
 			e->reg = register_alloc();
-			fprintf(file,"MOV %s, %s\n",symbol_code(e->symbol),register_name(e->reg));
+			fprintf(file,"MOVQ %s, %s\n",symbol_code(e->symbol),register_name(e->reg));
 			break;
 		case EXPR_BOOLEAN_LITERAL:
 		case EXPR_INTEGER_LITERAL:
 		case EXPR_CHARACTER_LITERAL:
 			e->reg = register_alloc();
-			fprintf(file,"MOV $%d, %s\n",e->literal_value, register_name(e->reg));
+			fprintf(file,"MOVQ $%d, %s\n",e->literal_value, register_name(e->reg));
 			break;
 		case EXPR_STRING_LITERAL:
+			e->reg = register_alloc();
+			e_name = register_name(e->reg);
+			int current_string_count = string_count++;
+			fprintf(file,".data\n");
+			fprintf(file,"STR%d:\n",current_string_count);
+			fprintf(file,".string \"%s\"\n",e->string_literal);
+			fprintf(file,".text\n");
+			fprintf(file,"LEAQ STR%d, %s\n",current_string_count,e_name);
 			break;
 	}
 }
