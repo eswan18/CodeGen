@@ -468,14 +468,14 @@ void expr_codegen(struct expr *e, FILE *file) {
 		case EXPR_ARRAY_DEREF:
 			break;
 		case EXPR_NAME:
+			e->reg = register_alloc();
+			fprintf(file,"MOV %s, %s\n",symbol_code(e->symbol),register_name(e->reg));
 			break;
 		case EXPR_BOOLEAN_LITERAL:
-			break;
 		case EXPR_INTEGER_LITERAL:
+		case EXPR_CHARACTER_LITERAL:
 			e->reg = register_alloc();
 			fprintf(file,"MOV $%d, %s\n",e->literal_value, register_name(e->reg));
-			break;
-		case EXPR_CHARACTER_LITERAL:
 			break;
 		case EXPR_STRING_LITERAL:
 			break;
