@@ -168,4 +168,86 @@ void decl_typecheck(struct decl *d) {
 }
 
 void decl_codegen(struct decl *d, FILE *file) {
+	switch(d->type->kind) {
+		case TYPE_FUNCTION:
+			decl_codegen_func(d, file);
+			break;
+		case TYPE_ARRAY:
+			fprintf(stderr,"Error: arrays not implemented\n");
+			exit(1);
+			break;
+		case TYPE_STRING:
+			break;
+		case TYPE_INTEGER:
+		case TYPE_CHARACTER:
+		case TYPE_BOOLEAN:
+			break;
+		case TYPE_VOID:
+			break;
+	}
+}
+
+void decl_codegen_func(struct decl *d, FILE *file) {
+	
+	//Define function	
+	fprintf(file,".text\n");
+	fprintf(file,".globl %s\n",d->name);
+	fprintf(file,"%s:\n",d->name);
+
+	//Count parameters
+	int param_count = 0;
+	struct param_list *a = d->type->params;
+	while(a) {
+		param_count++;
+		a = a->next;
+	}
+
+	//Preamble
+	fprintf(file,"\tpushq %%rbp\n"); //save the base pointer
+	fprintf(file,"\tmovq %%rsp, %%rbp\n\n"); // set the new base pointer to esp
+	switch(param_count) { //save arguments on the stack
+		case 6:
+			fprintf(file,"\tpushq %%r9\n");
+		case 5:
+			fprintf(file,"\tpushq %%r8\n");
+		case 4:
+			fprintf(file,"\tpushq %%rcx\n");
+		case 3:
+			fprintf(file,"\tpushq %%rdx\n");
+		case 2:
+			fprintf(file,"\tpushq %%rsi\n");
+		case 1:
+			fprintf(file,"\tpushq %%rdi\n");
+		case 0:
+			break;
+		default:
+			fprintf(stderr,"Error: functions may not have more than 6 parameters\n");
+			exit(1);
+	}
+	
+	//allocate the appropriate number of local variables
+	//MORE TO DO HERE
+	
+	fprintf(file,"\tpushq %%rbx\n");//save callee-saved registers
+	fprintf(file,"\tpushq %%r12\n");
+	fprintf(file,"\tpushq %%r13\n");
+	fprintf(file,"\tpushq %%r14\n");
+	fprintf(file,"\tpushq %%r15\n");
+
+	//body of function
+	fprintf(file,"########### BODY OF FUNCTION: ###########\n");
+	stmt_codegen(d->code, file);
+	fprintf(file,"########### END OF FUNCTION BODY ###########\n");
+	
+	//Epilogue
+	fprintf(file,"\tpopq %%r15\n");//resore callee-saved registers
+	fprintf(file,"\tpopq %%r14\n");
+	fprintf(file,"\tpopq %%r13\n");
+	fprintf(file,"\tpopq %%r12\n");
+	fprintf(file,"\tpopq %%rbx\n\n");
+	
+	fprintf(file,"\tmovq %%rbp, %%rsp\n"); //reset stack to base pointer
+	fprintf(file,"\tpopq %%rbp\n\n"); //restore the old base pointer
+
+	fprintf(file,"\tret\n");//return
 }

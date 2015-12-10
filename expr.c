@@ -424,6 +424,7 @@ int expr_check_args_params(struct expr *e) {
 }
 
 void expr_codegen(struct expr *e, FILE *file) {
+	fprintf(file,"#EXPR_CODEGEN\n");
 	const char *left_name = 0;
 	const char *right_name = 0;
 	const char *e_name;
@@ -547,6 +548,7 @@ void expr_codegen(struct expr *e, FILE *file) {
 }
 
 void expr_codegen_func(struct expr *e, FILE *file) {
+	fprintf(file,"#EXPR_CODEGEN_FUNC\n");
 	//Count arguments
 	int arg_count = 0;
 	struct expr *current_list_element = e;
