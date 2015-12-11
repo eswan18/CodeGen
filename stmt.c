@@ -179,6 +179,7 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 
 	switch(s->kind) {
 		case STMT_DECL:
+			decl_codegen(s->decl,file);
 			break;
 		case STMT_EXPR:
 			expr_codegen(s->expr,file);
@@ -223,6 +224,7 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 			}
 			break;
 		case STMT_BLOCK:
+			stmt_codegen(s->body,file);
 			break;
 	}	
 

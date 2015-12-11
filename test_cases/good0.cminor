@@ -1,10 +1,9 @@
-print_it: function void(c: char, d: integer, b:boolean, e:boolean);
 
 main: function integer() = {
-	print_it('d',50,true,false);
-	return 0;
+	x: integer = 10;
+	print x, '\n';
+	y: boolean = true;
+	print y;
+	return x;
 }
 
-print_it: function void(c: char, d: integer, b:boolean,e:boolean) = {
-	print c, d, b, e;
-}

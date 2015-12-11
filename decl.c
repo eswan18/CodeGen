@@ -9,6 +9,7 @@ struct type *return_type = 0;
 
 extern int type_error_count;
 extern int string_count;
+int param_count = 0;
 
 struct decl *decl_create(char *name, struct type *t, struct expr *v, struct stmt *c, struct decl *next) {
 	struct decl *decl = malloc(sizeof(struct decl));
@@ -219,7 +220,7 @@ void decl_codegen_func(struct decl *d, FILE *file) {
 	fprintf(file,"%s:\n",d->name);
 
 	//Count parameters
-	int param_count = 0;
+	param_count = 0;
 	struct param_list *a = d->type->params;
 	while(a) {
 		param_count++;
@@ -280,6 +281,7 @@ void decl_codegen_func(struct decl *d, FILE *file) {
 }
 
 void decl_codegen_literal(struct decl *d, FILE *file) {
+	const char *reg_name = 0;
 	switch(d->symbol->kind) {
 		case SYMBOL_GLOBAL:
 			fprintf(file,".data\n");
@@ -289,8 +291,11 @@ void decl_codegen_literal(struct decl *d, FILE *file) {
 			else
 				fprintf(file,"\t.quad 0\n");
 		case SYMBOL_LOCAL:
-			//MORE TO DO HERE
-			d->symbol->which;
+			if(d->value) {
+				expr_codegen(d->value, file);
+				reg_name = register_name(d->value->reg);
+				fprintf(file,"movq %s, %s\n",reg_name,symbol_code(d->symbol));
+			} 
 			break;
 		case SYMBOL_PARAM:
 			fprintf(stderr,"Error: unexpected declaration of a parameter\n");
