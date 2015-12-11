@@ -1,7 +1,9 @@
 main: function boolean () = {
 	y: boolean = true;
 	if (y == false) {
+		print "it was false!\n";
 		y = true;
 	}
-	return y;
+	print y;
+	return true;
 }

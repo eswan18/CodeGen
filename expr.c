@@ -698,7 +698,7 @@ void expr_codegen(struct expr *e, FILE *file) {
 			break;
 		case EXPR_NAME:
 			e->reg = register_alloc();
-			fprintf(file,"MOVQ %s, %s\n",symbol_code(e->symbol),register_name(e->reg));
+			fprintf(file,"movq %s, %s\n",symbol_code(e->symbol),register_name(e->reg));
 			break;
 		case EXPR_BOOLEAN_LITERAL:
 		case EXPR_INTEGER_LITERAL:

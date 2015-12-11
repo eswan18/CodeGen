@@ -190,12 +190,9 @@ void decl_codegen(struct decl *d, FILE *file) {
 				fprintf(file,"%s:\n",d->name);
 				fprintf(file,"\t.quad 0\n");
 				fprintf(file,"STR%d:\n",current_string_count);
+				d->symbol->code = current_string_count;
 				fprintf(file,"\t.string \"%s\"\n",d->value->string_literal);
 				fprintf(file,".text\n");
-				int reg = register_alloc();
-				fprintf(file,"leaq STR%d, %s\n",current_string_count,register_name(reg));
-				fprintf(file,"movq %s, %s\n",register_name(reg),d->name);
-				register_free(reg);
 			}
 			break;
 		case TYPE_INTEGER:

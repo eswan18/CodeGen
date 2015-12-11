@@ -1,5 +1,7 @@
 x: char = '3';
 
+func: function char(c: integer, x:char);
+
 main: function void() = {
 	{
 		print "this is a statement block\n";

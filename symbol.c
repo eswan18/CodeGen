@@ -9,13 +9,19 @@ struct symbol *symbol_create(symbol_t kind, struct type *type, char *name) {
 	symbol -> kind = kind;
 	symbol -> type = type;
 	symbol -> name = name;
-	symbol -> code = ++symbol_current_code;
+	symbol -> code = 0;
 	return symbol;
 }
 
 char *symbol_code(struct symbol *s) {
-	if(s->kind == SYMBOL_GLOBAL)
-		return s->name;
+	if(s->kind == SYMBOL_GLOBAL) {
+		char *str = malloc(sizeof(char)*256);
+		sprintf(str,"STR%d",s->code);
+		if(s->type->kind == TYPE_STRING)
+			return str;
+		else
+			return s->name;
+	}
 	if(s->kind == SYMBOL_PARAM) {
 		char *str = malloc(sizeof(char)*256);
 		sprintf(str,"-%d(%%rbp)",8*s->which);

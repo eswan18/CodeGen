@@ -1,3 +1,5 @@
+make_int: function integer(c: char);
+
 main: function integer() = {
 	z: integer = 0;
 	y: string = "yes";
