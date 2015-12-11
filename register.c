@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 int register_usage [] = {1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0};
+int register_current_label = 0;
 
 const char *register_name(int r) {
 	char *c = malloc(4*sizeof(char *));
@@ -77,4 +78,11 @@ int register_alloc() {
 
 void register_free(int r) {
 	register_usage[r] = 0;
+}
+
+char *register_next_label() {
+	char *label = malloc(sizeof(char)*50);
+	sprintf(label,"L%d",register_current_label);
+	register_current_label++;
+	return label;
 }

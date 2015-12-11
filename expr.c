@@ -428,11 +428,14 @@ void expr_codegen(struct expr *e, FILE *file) {
 	const char *left_name = 0;
 	const char *right_name = 0;
 	const char *e_name;
+	char *label1 = 0;
+	char *label2 = 0;
+	char *label3 = 0;
 	switch(e->kind) {
 		case EXPR_ASSIGN:
 			expr_codegen(e->right,file);
 			right_name = register_name(e->right->reg);
-			fprintf(file,"MOVQ %s, %s\n",right_name,symbol_code(e->left->symbol));
+			fprintf(file,"movq %s, %s\n",right_name,symbol_code(e->left->symbol));
 			e->reg = e->right->reg;
 			break;
 		case EXPR_ADD:
@@ -440,7 +443,7 @@ void expr_codegen(struct expr *e, FILE *file) {
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			fprintf(file,"ADDQ %s, %s\n",left_name,right_name);
+			fprintf(file,"addq %s, %s\n",left_name,right_name);
 			e->reg = e->right->reg;
 			register_free(e->left->reg);
 			break;
@@ -469,14 +472,24 @@ void expr_codegen(struct expr *e, FILE *file) {
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"movq %s, %%rax\n",left_name);
+			register_free(e->left->reg);
+			fprintf(file,"cqo\n");
+			fprintf(file,"idivq %s\n",right_name);
+			fprintf(file,"movq %%rax, %s\n",right_name);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_MOD:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"movq %s, %%rax\n",left_name);
+			register_free(e->left->reg);
+			fprintf(file,"cqo\n");
+			fprintf(file,"idivq %s\n",right_name);
+			fprintf(file,"movq %%rdx, %s\n",right_name);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_AND:
 			expr_codegen(e->left,file);
@@ -494,50 +507,119 @@ void expr_codegen(struct expr *e, FILE *file) {
 			break;
 		case EXPR_NOT:
 			expr_codegen(e->left,file);
-			expr_codegen(e->right,file);
-			//MORE TO DO
+			left_name = register_name(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"cmpq $0, %s\n",left_name);
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"movq $0, %s\n",left_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",left_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->left->reg;
 			break;
 		case EXPR_LT:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",right_name,left_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"jl %s\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_LE:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",right_name,left_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"jle %s\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_GT:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",right_name,left_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"jg %s\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_GE:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",right_name,left_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"jge %s\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_EQ:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",left_name,right_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_NE:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"cmpq %s, %s\n",left_name,right_name);
+			register_free(e->left->reg);
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"movq $1, %s\n",right_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $0, %s\n",right_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_EXPON:
 			expr_codegen(e->left,file);
@@ -592,7 +674,7 @@ void expr_codegen(struct expr *e, FILE *file) {
 		case EXPR_INTEGER_LITERAL:
 		case EXPR_CHARACTER_LITERAL:
 			e->reg = register_alloc();
-			fprintf(file,"MOVQ $%d, %s\n",e->literal_value, register_name(e->reg));
+			fprintf(file,"movq $%d, %s\n",e->literal_value, register_name(e->reg));
 			break;
 		case EXPR_STRING_LITERAL:
 			e->reg = register_alloc();
@@ -602,13 +684,12 @@ void expr_codegen(struct expr *e, FILE *file) {
 			fprintf(file,"STR%d:\n",current_string_count);
 			fprintf(file,".string \"%s\"\n",e->string_literal);
 			fprintf(file,".text\n");
-			fprintf(file,"LEAQ STR%d, %s\n",current_string_count,e_name);
+			fprintf(file,"leaq STR%d, %s\n",current_string_count,e_name);
 			break;
 	}
 }
 
 void expr_codegen_func(struct expr *e, FILE *file) {
-	fprintf(file,"#EXPR_CODEGEN_FUNC\n");
 	//Count arguments
 	int arg_count = 0;
 	struct expr *current_list_element = e;
@@ -629,37 +710,37 @@ void expr_codegen_func(struct expr *e, FILE *file) {
 			current_expr = e->right->right->right->right->right->right;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%r9\n",reg_name);
+			fprintf(file,"movq %s, %%r9\n",reg_name);
 			register_free(current_expr->reg);
 		case 5:
 			current_expr = e->right->right->right->right->right->left;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%r8\n",reg_name);
+			fprintf(file,"movq %s, %%r8\n",reg_name);
 			register_free(current_expr->reg);
 		case 4:
 			current_expr = e->right->right->right->right->left;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%rcx\n",reg_name);
+			fprintf(file,"movq %s, %%rcx\n",reg_name);
 			register_free(current_expr->reg);
 		case 3:
 			current_expr = e->right->right->right->left;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%rdx\n",reg_name);
+			fprintf(file,"movq %s, %%rdx\n",reg_name);
 			register_free(current_expr->reg);
 		case 2:
 			current_expr = e->right->right->left;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%rsi\n",reg_name);
+			fprintf(file,"movq %s, %%rsi\n",reg_name);
 			register_free(current_expr->reg);	
 		case 1:
 			current_expr = e->right->left;
 			expr_codegen(current_expr,file);
 			reg_name = register_name(current_expr->reg);
-			fprintf(file,"MOVQ %s, %%rdi\n",reg_name);
+			fprintf(file,"movq %s, %%rdi\n",reg_name);
 			register_free(current_expr->reg);
 	}
 

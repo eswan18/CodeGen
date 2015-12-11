@@ -2,6 +2,6 @@ x:integer = 0;
 
 y: integer = 4;
 
-main: function integer() = {
-	return 45*3*y;
+main: function boolean() = {
+	return (!(7 > 7));
 }

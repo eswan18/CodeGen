@@ -20,18 +20,24 @@ main:
 #EXPR_CODEGEN
 #EXPR_CODEGEN
 #EXPR_CODEGEN
-MOVQ $45, %r9
+movq $7, %r9
 #EXPR_CODEGEN
-MOVQ $3, %r10
-movq %r9, %rax
-imulq %r10
-movq %rax, %r10
-#EXPR_CODEGEN
-MOVQ y, %r9
+movq $7, %r10
+cmpq %r10, %r9
+jg L0
+movq $0, %r10
+jmp L1
+L0:
+movq $1, %r10
+L1:
+cmpq $0, %r10
+je L2
+movq $0, %r10
+jmp L3
+L2:
+movq $1, %r10
+L3:
 movq %r10, %rax
-imulq %r9
-movq %rax, %r9
-movq %r9, %rax
 ########### END OF FUNCTION BODY ###########
 
 	popq %r15
