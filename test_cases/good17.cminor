@@ -1,4 +1,4 @@
 main: function integer() = {
-	print (2^9);
+	print 0, "c", 'c';
 	return 0;
 }

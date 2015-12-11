@@ -1,0 +1,15 @@
+x: char = '3';
+
+main: function void() = {
+	{
+		print "this is a statement block\n";
+	}
+	i: integer = 0;
+	func(i, x);
+	return;
+}
+
+func: function char(c: integer, x: char) = {
+	print c;
+	print x;
+}

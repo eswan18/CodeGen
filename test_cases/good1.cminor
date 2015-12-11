@@ -1,9 +1,9 @@
-// assign integer expression to local variable/ typechecking with function call
-x:integer = 5;
-y:integer = 10;
-main:function void ()=
-{
-	x:integer = y * 10 + 15 - 4;
-}
-	
+x:integer = 0;
 
+y: integer = 4;
+
+main: function boolean() = {
+	print 400*20;
+	print "hi";
+	return (true || true);
+}

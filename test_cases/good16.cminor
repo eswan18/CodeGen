@@ -1,0 +1,8 @@
+main: function integer() = {
+	print (alphabet());
+	return 0;
+}
+
+print_alphabet: function string() = {
+	return "abcdefghijklmnopqrstuvwxyz";
+}

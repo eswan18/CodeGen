@@ -1,0 +1,10 @@
+main: function integer() = {
+	s: string = "hey";
+	t: string = "hi";
+	u: string = "hey";
+	if(s == u)
+		print "yes";
+	if(s == t)
+		print "no";
+	return 0;
+}

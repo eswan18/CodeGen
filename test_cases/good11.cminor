@@ -1,0 +1,9 @@
+main: function integer() = {
+	x: integer = 0;
+	y: integer = 1;
+	z: integer = 2;
+	for(x = y; x < z; x = x + y) {
+		print 'y';
+	}
+	return 0;
+}

@@ -649,7 +649,12 @@ void expr_codegen(struct expr *e, FILE *file) {
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			fprintf(file,"movq %s, %%rdi\n",left_name);
+			fprintf(file,"movq %s, %%rsi\n",right_name);
+			register_free(e->left->reg);
+			fprintf(file,"call integer_power\n");
+			fprintf(file,"movq %%rax, %s\n",right_name);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_INCR:
 			e->reg = register_alloc();

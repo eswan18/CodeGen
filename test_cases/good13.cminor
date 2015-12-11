@@ -1,0 +1,9 @@
+c: integer = 199;
+
+main: function integer() = {
+	if(3 >= 4)
+		print "That's impossible\n";
+	if(c != 5)
+		print "right!\n";
+	return 0;
+}

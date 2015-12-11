@@ -1,0 +1,7 @@
+main: function integer() = {
+	x: string = "x";
+	y: char = 'y';
+	z: integer = 26;
+	print x,y,z;
+	return 0;
+}

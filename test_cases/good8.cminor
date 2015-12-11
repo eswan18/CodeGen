@@ -1,6 +1,10 @@
-// test 1d array assignments
-x:array [5] integer = {1,2,3,4,5};
-main:function void () =
-{
-	x[4] = 4;
+main: function integer() = {
+	x: string = "hi";
+	y: integer = 3;
+	z: integer = 5;
+	if( y < z)
+		print "yes";
+	else
+		print "no";
+	return 0;
 }

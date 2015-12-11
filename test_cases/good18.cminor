@@ -1,0 +1,11 @@
+main2: function integer(i: integer) = {
+	
+}
+
+main: function integer() = {
+	if(main2(1)) == 1)
+		print 2;
+	else
+		print main2(1)%main2(0);
+	return 0;
+}
