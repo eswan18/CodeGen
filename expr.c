@@ -424,6 +424,8 @@ int expr_check_args_params(struct expr *e) {
 }
 
 void expr_codegen(struct expr *e, FILE *file) {
+	if(!e)
+		return;
 	const char *left_name = 0;
 	const char *right_name = 0;
 	const char *e_name;

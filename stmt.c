@@ -198,8 +198,29 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 			fprintf(file,"%s:\n",label1);
 			stmt_codegen(s->else_body,file);
 			fprintf(file,"%s:\n",label2);
+			register_free(s->expr->reg);
 			break;
 		case STMT_FOR:
+			label1 = register_next_label();
+			label2 = register_next_label();
+			if(s->init_expr) {
+				expr_codegen(s->init_expr,file);
+				register_free(s->init_expr->reg);
+			}
+			fprintf(file,"%s:\n",label1);
+			if(s->expr) {
+				expr_codegen(s->expr,file);
+				fprintf(file,"cmpq $1, %s\n",register_name(s->expr->reg));
+				fprintf(file,"jne %s\n",label2);
+				register_free(s->expr->reg);
+			}
+			stmt_codegen(s->body,file);
+			if (s->next_expr) {
+				expr_codegen(s->next_expr,file);
+				register_free(s->next_expr->reg);
+			}
+			fprintf(file,"jmp %s\n",label1);
+			fprintf(file,"%s:\n",label2);
 			break;
 		case STMT_PRINT:
 			current_expr = s->expr;

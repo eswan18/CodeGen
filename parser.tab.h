@@ -1,0 +1,55 @@
+#define TOKEN_PRINT 257
+#define TOKEN_FUNCTION 258
+#define TOKEN_FOR 259
+#define TOKEN_IF 260
+#define TOKEN_ELSE 261
+#define TOKEN_RETURN 262
+#define TOKEN_LEFT_BRACE 263
+#define TOKEN_RIGHT_BRACE 264
+#define TOKEN_LEFT_PAREN 265
+#define TOKEN_RIGHT_PAREN 266
+#define TOKEN_LEFT_BRACKET 267
+#define TOKEN_RIGHT_BRACKET 268
+#define TOKEN_STRING 269
+#define TOKEN_INTEGER 270
+#define TOKEN_CHAR 271
+#define TOKEN_VOID 272
+#define TOKEN_BOOLEAN 273
+#define TOKEN_ARRAY 274
+#define TOKEN_GE 275
+#define TOKEN_LE 276
+#define TOKEN_EQ 277
+#define TOKEN_NE 278
+#define TOKEN_LT 279
+#define TOKEN_GT 280
+#define TOKEN_AND 281
+#define TOKEN_OR 282
+#define TOKEN_NOT 283
+#define TOKEN_INCREMENT 284
+#define TOKEN_DECREMENT 285
+#define TOKEN_ADD 286
+#define TOKEN_SUBTRACT 287
+#define TOKEN_MULTIPLY 288
+#define TOKEN_DIVIDE 289
+#define TOKEN_MODULUS 290
+#define TOKEN_EXPONENTIATE 291
+#define TOKEN_ASSIGN 292
+#define TOKEN_COMMA 293
+#define TOKEN_COLON 294
+#define TOKEN_SEMICOLON 295
+#define TOKEN_TRUE 296
+#define TOKEN_FALSE 297
+#define TOKEN_CHAR_LITERAL 298
+#define TOKEN_INTEGER_LITERAL 299
+#define TOKEN_STRING_LITERAL 300
+#define TOKEN_IDENTIFIER 301
+typedef union {
+	struct decl *decl;
+	struct expr *expr;
+	struct stmt *stmt;
+	struct type *type;
+	struct param_list *param_list;
+	char *name;
+	int integer;
+} YYSTYPE;
+extern YYSTYPE yylval;

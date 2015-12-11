@@ -1,9 +1,6 @@
-
 main: function integer() = {
-	y:integer = 4;
-	if(y < 4 && true) {
-		print "yes\n";
-	}
+	i: integer = 2;
+	for(i = 0; i < 3 ;) 
+		print i;
 	return 0;
 }
-
