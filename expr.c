@@ -424,7 +424,6 @@ int expr_check_args_params(struct expr *e) {
 }
 
 void expr_codegen(struct expr *e, FILE *file) {
-	fprintf(file,"#EXPR_CODEGEN\n");
 	const char *left_name = 0;
 	const char *right_name = 0;
 	const char *e_name;
@@ -496,14 +495,38 @@ void expr_codegen(struct expr *e, FILE *file) {
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"cmpq $0, %s\n",left_name);
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"cmpq $0, %s\n",right_name);
+			register_free(e->right->reg);
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"movq $1, %s\n",left_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $0, %s\n",left_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->left->reg;
 			break;
 		case EXPR_OR:
 			expr_codegen(e->left,file);
 			expr_codegen(e->right,file);
 			left_name = register_name(e->left->reg);
 			right_name = register_name(e->right->reg);
-			//MORE TO DO
+			label1 = register_next_label();
+			label2 = register_next_label();
+			fprintf(file,"cmpq $1, %s\n",left_name);
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"cmpq $1, %s\n",right_name);
+			register_free(e->right->reg);
+			fprintf(file,"je %s\n",label1);
+			fprintf(file,"movq $0, %s\n",left_name);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			fprintf(file,"movq $1, %s\n",left_name);
+			fprintf(file,"%s:\n",label2);
+			e->reg = e->left->reg;
 			break;
 		case EXPR_NOT:
 			expr_codegen(e->left,file);

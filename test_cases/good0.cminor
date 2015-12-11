@@ -2,6 +2,10 @@ x:integer = 0;
 
 y: integer = 4;
 
+z: string = "hi";
 main: function boolean() = {
-	return (!(7 > 7));
+	print 400*20;
+	print z;
+	print "hi";
+	return (true || true);
 }

@@ -4,6 +4,14 @@ x:
 .data
 y:
 	.quad 4
+.data
+z:
+	.quad 0
+STR0:
+	.string "hi"
+.text
+leaq STR0, %r9
+movq %r9, z
 .text
 .globl main
 main:
@@ -17,27 +25,35 @@ main:
 	pushq %r15
 
 ########### BODY OF FUNCTION: ###########
-#EXPR_CODEGEN
-#EXPR_CODEGEN
-#EXPR_CODEGEN
-movq $7, %r9
-#EXPR_CODEGEN
-movq $7, %r10
-cmpq %r10, %r9
-jg L0
-movq $0, %r10
+movq $400, %r9
+movq $20, %r10
+movq %r9, %rax
+imulq %r10
+movq %rax, %r10
+movq %r10, %rdi
+call print_integer
+MOVQ z, %r9
+movq %r9, %rdi
+call print_string
+.data
+STR1:
+.string "hi"
+.text
+leaq STR1, %r9
+movq %r9, %rdi
+call print_string
+movq $1, %r9
+movq $1, %r10
+cmpq $1, %r9
+je L0
+cmpq $1, %r10
+je L0
+movq $0, %r9
 jmp L1
 L0:
-movq $1, %r10
+movq $1, %r9
 L1:
-cmpq $0, %r10
-je L2
-movq $0, %r10
-jmp L3
-L2:
-movq $1, %r10
-L3:
-movq %r10, %rax
+movq %r9, %rax
 ########### END OF FUNCTION BODY ###########
 
 	popq %r15

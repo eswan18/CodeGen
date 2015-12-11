@@ -3,10 +3,12 @@
 #include "decl.h"
 #include "symbol.h"
 #include "scope.h"
+#include "register.h"
 
 struct type *return_type = 0;
 
 extern int type_error_count;
+extern int string_count;
 
 struct decl *decl_create(char *name, struct type *t, struct expr *v, struct stmt *c, struct decl *next) {
 	struct decl *decl = malloc(sizeof(struct decl));
@@ -170,7 +172,7 @@ void decl_typecheck(struct decl *d) {
 void decl_codegen(struct decl *d, FILE *file) {
 	if(!d)
 		return;
-	
+	int current_string_count;
 	switch(d->type->kind) {
 		case TYPE_FUNCTION:
 			decl_codegen_func(d, file);
@@ -180,6 +182,19 @@ void decl_codegen(struct decl *d, FILE *file) {
 			exit(1);
 			break;
 		case TYPE_STRING:
+			current_string_count = string_count++;
+			if(d->symbol->kind == SYMBOL_GLOBAL) {
+				fprintf(file,".data\n");
+				fprintf(file,"%s:\n",d->name);
+				fprintf(file,"\t.quad 0\n");
+				fprintf(file,"STR%d:\n",current_string_count);
+				fprintf(file,"\t.string \"%s\"\n",d->value->string_literal);
+				fprintf(file,".text\n");
+				int reg = register_alloc();
+				fprintf(file,"leaq STR%d, %s\n",current_string_count,register_name(reg));
+				fprintf(file,"movq %s, %s\n",register_name(reg),d->name);
+				register_free(reg);
+			}
 			break;
 		case TYPE_INTEGER:
 		case TYPE_CHARACTER:

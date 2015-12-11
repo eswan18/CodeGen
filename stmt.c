@@ -175,6 +175,7 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 		return;
 
 	const char *expr_reg_name = 0;
+	struct expr *current_expr = 0;
 
 	switch(s->kind) {
 		case STMT_DECL:
@@ -186,6 +187,31 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 		case STMT_FOR:
 			break;
 		case STMT_PRINT:
+			current_expr = s->expr;
+			while(current_expr && current_expr->kind == EXPR_LIST) {
+				expr_codegen(current_expr->left,file);
+				expr_reg_name = register_name(current_expr->left->reg);
+				fprintf(file,"movq %s, %%rdi\n",expr_reg_name);
+				register_free(current_expr->left->reg);
+				switch(expr_typecheck(current_expr)->kind) {
+					case TYPE_BOOLEAN:
+						fprintf(file,"call print_boolean\n");
+						break;
+					case TYPE_CHARACTER:
+						fprintf(file,"call print_character\n");
+						break;
+					case TYPE_INTEGER:
+						fprintf(file,"call print_integer\n");
+						break;
+					case TYPE_STRING:
+						fprintf(file,"call print_string\n");
+						break;
+					default:
+						fprintf(stderr,"error: attempting to print illegal type\n");
+						exit(1);
+				}
+				current_expr = current_expr -> right;
+			}
 			break;
 		case STMT_RETURN:
 			if(s->expr) {
