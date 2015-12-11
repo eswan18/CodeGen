@@ -175,7 +175,8 @@ void decl_codegen(struct decl *d, FILE *file) {
 	int current_string_count;
 	switch(d->type->kind) {
 		case TYPE_FUNCTION:
-			decl_codegen_func(d, file);
+			if(d->code)
+				decl_codegen_func(d, file);
 			break;
 		case TYPE_ARRAY:
 			fprintf(stderr,"Error: arrays not implemented\n");
@@ -228,26 +229,25 @@ void decl_codegen_func(struct decl *d, FILE *file) {
 	//Preamble
 	fprintf(file,"\tpushq %%rbp\n"); //save the base pointer
 	fprintf(file,"\tmovq %%rsp, %%rbp\n\n"); // set the new base pointer to esp
-	switch(param_count) { //save arguments on the stack
-		case 6:
-			fprintf(file,"\tpushq %%r9\n");
-		case 5:
-			fprintf(file,"\tpushq %%r8\n");
-		case 4:
-			fprintf(file,"\tpushq %%rcx\n");
-		case 3:
-			fprintf(file,"\tpushq %%rdx\n");
-		case 2:
-			fprintf(file,"\tpushq %%rsi\n");
-		case 1:
-			fprintf(file,"\tpushq %%rdi\n");
-		case 0:
-			break;
-		default:
-			fprintf(stderr,"Error: functions may not have more than 6 parameters\n");
-			exit(1);
-	}
 	
+	if(param_count >= 1)
+		fprintf(file,"\tpushq %%rdi\n");
+	if(param_count >= 2)
+		fprintf(file,"\tpushq %%rsi\n");
+	if(param_count >= 3)
+		fprintf(file,"\tpushq %%rdx\n");
+	if(param_count >= 4)
+		fprintf(file,"\tpushq %%rcx\n");
+	if(param_count >= 5)
+		fprintf(file,"\tpushq %%r8\n");
+	if(param_count >= 6)
+		fprintf(file,"\tpushq %%r9\n");
+	if(param_count > 6) {
+		fprintf(stderr,"Error: functions may not have more than 6 parameters\n");
+		exit(1);
+	}
+	fprintf(file,"\n");	
+
 	//allocate the appropriate number of local variables
 	int locals_count = stmt_count_decl(d->code);
 	if (locals_count > 0) {
@@ -290,6 +290,7 @@ void decl_codegen_literal(struct decl *d, FILE *file) {
 				fprintf(file,"\t.quad 0\n");
 		case SYMBOL_LOCAL:
 			//MORE TO DO HERE
+			d->symbol->which;
 			break;
 		case SYMBOL_PARAM:
 			fprintf(stderr,"Error: unexpected declaration of a parameter\n");

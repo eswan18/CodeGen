@@ -15,7 +15,9 @@ struct symbol *symbol_create(symbol_t kind, struct type *type, char *name) {
 char *symbol_code(struct symbol *s) {
 	if(s->kind == SYMBOL_GLOBAL)
 		return s->name;
-	char *str = malloc(sizeof(char *)*256);
-	sprintf(str,"%d",s->code);
-	return str;
+	if(s->kind == SYMBOL_PARAM) {
+		char *str = malloc(sizeof(char *)*256);
+		sprintf(str,"-%d(%%rbp)",8*s->which);
+		return str;
+	}
 }

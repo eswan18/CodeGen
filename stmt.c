@@ -181,6 +181,7 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 		case STMT_DECL:
 			break;
 		case STMT_EXPR:
+			expr_codegen(s->expr,file);
 			break;
 		case STMT_IF_ELSE:
 			break;

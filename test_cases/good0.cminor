@@ -1,4 +1,10 @@
+print_it: function void(c: char, d: integer, b:boolean, e:boolean);
+
 main: function integer() = {
-	print (2^9);
+	print_it('d',50,true,false);
 	return 0;
+}
+
+print_it: function void(c: char, d: integer, b:boolean,e:boolean) = {
+	print c, d, b, e;
 }

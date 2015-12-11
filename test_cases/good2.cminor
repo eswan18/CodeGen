@@ -1,4 +1,4 @@
 main: function integer () = {
-	printf "hello friends";
+	print "hello friends";
 	return 0;
 }
