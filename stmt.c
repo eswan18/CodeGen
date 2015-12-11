@@ -176,6 +176,8 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 
 	const char *expr_reg_name = 0;
 	struct expr *current_expr = 0;
+	char *label1 = 0;
+	char *label2 = 0;
 
 	switch(s->kind) {
 		case STMT_DECL:
@@ -185,6 +187,17 @@ void stmt_codegen(struct stmt *s, FILE *file) {
 			expr_codegen(s->expr,file);
 			break;
 		case STMT_IF_ELSE:
+			label1 = register_next_label();
+			label2 = register_next_label();
+			expr_codegen(s->expr,file);
+			expr_reg_name = register_name(s->expr->reg);
+			fprintf(file,"cmpq $1, %s\n",expr_reg_name);
+			fprintf(file,"jne %s\n",label1);
+			stmt_codegen(s->body,file);
+			fprintf(file,"jmp %s\n",label2);
+			fprintf(file,"%s:\n",label1);
+			stmt_codegen(s->else_body,file);
+			fprintf(file,"%s:\n",label2);
 			break;
 		case STMT_FOR:
 			break;
