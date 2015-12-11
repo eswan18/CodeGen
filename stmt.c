@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "stmt.h"
 #include "scope.h"
+#include "register.h"
 
 extern int type_error_count;
 extern struct type *return_type;
@@ -170,4 +171,58 @@ void stmt_typecheck(struct stmt *s) {
 }
 
 void stmt_codegen(struct stmt *s, FILE *file) {
+	if(!s)
+		return;
+
+	const char *expr_reg_name = 0;
+
+	switch(s->kind) {
+		case STMT_DECL:
+			break;
+		case STMT_EXPR:
+			break;
+		case STMT_IF_ELSE:
+			break;
+		case STMT_FOR:
+			break;
+		case STMT_PRINT:
+			break;
+		case STMT_RETURN:
+			if(s->expr) {
+				expr_codegen(s->expr,file);
+				expr_reg_name = register_name(s->expr->reg);
+				fprintf(file,"movq %s, %%rax\n", expr_reg_name);
+				register_free(s->expr->reg);
+			}
+			break;
+		case STMT_BLOCK:
+			break;
+	}	
+
+	stmt_codegen(s->next,file);
+}
+
+int stmt_count_decl(struct stmt *s) {
+	if(!s)
+		return 0;
+	int count_decl = 0;
+	switch(s->kind) {
+		case STMT_DECL:
+			count_decl = 1;
+			break;
+		case STMT_EXPR:
+		case STMT_PRINT:
+		case STMT_RETURN:
+			break;
+		case STMT_IF_ELSE:
+			count_decl = stmt_count_decl(s->else_body);
+		case STMT_BLOCK:
+		case STMT_FOR:
+			count_decl += stmt_count_decl(s->body);
+			break;
+	}
+	if(!s->next)
+		return count_decl;
+	else
+		return count_decl + stmt_count_decl(s->next);
 }

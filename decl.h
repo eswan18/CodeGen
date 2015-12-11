@@ -24,5 +24,6 @@ void decl_typecheck(struct decl *d);
 
 void decl_codegen(struct decl *d, FILE *file);
 void decl_codegen_func(struct decl *d, FILE *file);
+void decl_codegen_literal(struct decl *d, FILE *file);
 
 #endif

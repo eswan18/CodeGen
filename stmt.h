@@ -34,5 +34,6 @@ void stmt_resolve(struct stmt *s, int should_print);
 void stmt_typecheck(struct stmt *s);
 
 void stmt_codegen(struct stmt *s, FILE *file);
+int stmt_count_decl(struct stmt *s);
 
 #endif

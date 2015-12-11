@@ -445,45 +445,105 @@ void expr_codegen(struct expr *e, FILE *file) {
 			register_free(e->left->reg);
 			break;
 		case EXPR_SUB:
-			//MORE TO DO
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
+			fprintf(file,"subq %s, %s\n",right_name,left_name);
+			e->reg = e->left->reg;
+			register_free(e->right->reg);
 			break;
 		case EXPR_MUL:
-			//MORE TO DO
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
+			fprintf(file,"movq %s, %%rax\n",left_name);
+			register_free(e->left->reg);
+			fprintf(file,"imulq %s\n",right_name);
+			fprintf(file,"movq %%rax, %s\n",right_name);
+			e->reg = e->right->reg;
 			break;
 		case EXPR_DIV:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_MOD:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_AND:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_OR:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_NOT:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
 			//MORE TO DO
 			break;
 		case EXPR_LT:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_LE:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_GT:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_GE:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_EQ:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_NE:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_EXPON:
+			expr_codegen(e->left,file);
+			expr_codegen(e->right,file);
+			left_name = register_name(e->left->reg);
+			right_name = register_name(e->right->reg);
 			//MORE TO DO
 			break;
 		case EXPR_INCR:

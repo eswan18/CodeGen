@@ -168,6 +168,9 @@ void decl_typecheck(struct decl *d) {
 }
 
 void decl_codegen(struct decl *d, FILE *file) {
+	if(!d)
+		return;
+	
 	switch(d->type->kind) {
 		case TYPE_FUNCTION:
 			decl_codegen_func(d, file);
@@ -181,14 +184,19 @@ void decl_codegen(struct decl *d, FILE *file) {
 		case TYPE_INTEGER:
 		case TYPE_CHARACTER:
 		case TYPE_BOOLEAN:
+			decl_codegen_literal(d, file);
 			break;
 		case TYPE_VOID:
 			break;
 	}
+
+	decl_codegen(d->next,file);
 }
 
 void decl_codegen_func(struct decl *d, FILE *file) {
-	
+	if(!d)
+		return;
+		
 	//Define function	
 	fprintf(file,".text\n");
 	fprintf(file,".globl %s\n",d->name);
@@ -226,21 +234,24 @@ void decl_codegen_func(struct decl *d, FILE *file) {
 	}
 	
 	//allocate the appropriate number of local variables
-	//MORE TO DO HERE
+	int locals_count = stmt_count_decl(d->code);
+	if (locals_count > 0) {
+		fprintf(file,"subq $%d, %%rsp\n",locals_count*8);
+	}
 	
-	fprintf(file,"\tpushq %%rbx\n");//save callee-saved registers
+	fprintf(file,"\tpushq %%rbx\n"); //save callee-saved registers
 	fprintf(file,"\tpushq %%r12\n");
 	fprintf(file,"\tpushq %%r13\n");
 	fprintf(file,"\tpushq %%r14\n");
-	fprintf(file,"\tpushq %%r15\n");
+	fprintf(file,"\tpushq %%r15\n\n");
 
 	//body of function
 	fprintf(file,"########### BODY OF FUNCTION: ###########\n");
 	stmt_codegen(d->code, file);
-	fprintf(file,"########### END OF FUNCTION BODY ###########\n");
+	fprintf(file,"########### END OF FUNCTION BODY ###########\n\n");
 	
 	//Epilogue
-	fprintf(file,"\tpopq %%r15\n");//resore callee-saved registers
+	fprintf(file,"\tpopq %%r15\n"); //restore callee-saved registers
 	fprintf(file,"\tpopq %%r14\n");
 	fprintf(file,"\tpopq %%r13\n");
 	fprintf(file,"\tpopq %%r12\n");
@@ -249,5 +260,25 @@ void decl_codegen_func(struct decl *d, FILE *file) {
 	fprintf(file,"\tmovq %%rbp, %%rsp\n"); //reset stack to base pointer
 	fprintf(file,"\tpopq %%rbp\n\n"); //restore the old base pointer
 
-	fprintf(file,"\tret\n");//return
+	fprintf(file,"\tret\n"); //return
+
+}
+
+void decl_codegen_literal(struct decl *d, FILE *file) {
+	switch(d->symbol->kind) {
+		case SYMBOL_GLOBAL:
+			fprintf(file,".data\n");
+			fprintf(file,"%s:\n",d->name);
+			if(d->value)
+				fprintf(file,"\t.quad %d\n",d->value->literal_value);
+			else
+				fprintf(file,"\t.quad 0\n");
+		case SYMBOL_LOCAL:
+			//MORE TO DO HERE
+			break;
+		case SYMBOL_PARAM:
+			fprintf(stderr,"Error: unexpected declaration of a parameter\n");
+			exit(1);
+			break;
+	}
 }
